@@ -7,13 +7,13 @@ from cv_bridge import CvBridge
 import cv2
 import numpy as np
 from scipy.spatial.transform import Rotation
-import time
 import json
 import yaml
 import os
 from datetime import datetime
 import socket
 import getpass
+import argparse
 
 # --- 1. 辅助函数 (无需修改) ---
 
@@ -40,55 +40,120 @@ def ensure_dir(path):
     if not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
 
+# --- 2. 命令行参数解析 ---
+
+def parse_arguments():
+    """解析命令行参数"""
+    parser = argparse.ArgumentParser(
+        description='双相机棋盘格外参标定程序',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+使用示例:
+  # 基本使用（使用默认参数）
+  python3 %(prog)s
+
+  # 自定义设备ID和操作员
+  python3 %(prog)s --device-id AGV_042 --operator zhang_san
+
+  # 禁用图像显示（无头模式）
+  python3 %(prog)s --no-display
+
+  # 自定义自动标定参数
+  python3 %(prog)s --stable-frames 3 --min-distance 0.3 --min-rotation 3.0
+
+  # 自定义ROS话题
+  python3 %(prog)s --front-image-topic /camera1/image_raw --rear-image-topic /camera2/image_raw
+
+  # 自定义棋盘格参数
+  python3 %(prog)s --squares-x 9 --squares-y 6 --square-size 0.03
+
+  # 禁用自动标定（手动模式）
+  python3 %(prog)s --no-auto
+
+  # 批量生产示例
+  python3 %(prog)s --device-id AGV_%(prog)s --operator worker_01 --output-dir /data/calibration --no-display
+        """
+    )
+
+    # === 设备信息参数 ===
+    parser.add_argument('--device-id', type=str, default='AGV_001',
+                        help='设备ID (默认: AGV_001)')
+    parser.add_argument('--operator', type=str, default=getpass.getuser(),
+                        help='操作员姓名 (默认: 当前用户名)')
+    parser.add_argument('--output-dir', type=str, default='./calibration_results',
+                        help='标定结果输出目录 (默认: ./calibration_results)')
+
+    # === ROS话题参数 ===
+    parser.add_argument('--front-image-topic', type=str,
+                        default='/camera/camera/color/image_raw',
+                        help='前方相机图像话题 (默认: /camera/camera/color/image_raw)')
+    parser.add_argument('--front-camera-info-topic', type=str,
+                        default='/camera/camera/color/camera_info',
+                        help='前方相机信息话题 (默认: /camera/camera/color/camera_info)')
+    parser.add_argument('--rear-image-topic', type=str,
+                        default='/camera/camera/color/image_raw',
+                        help='后方相机图像话题 (默认: /camera/color/image_raw)')
+    parser.add_argument('--rear-camera-info-topic', type=str,
+                        default='/camera/camera/color/camera_info',
+                        help='后方相机信息话题 (默认: /camera/color/camera_info)')
+
+    # === 棋盘格参数 ===
+    parser.add_argument('--squares-x', type=int, default=4,
+                        help='棋盘格X方向内角点数 (默认: 4)')
+    parser.add_argument('--squares-y', type=int, default=3,
+                        help='棋盘格Y方向内角点数 (默认: 3)')
+    parser.add_argument('--square-size', type=float, default=0.06,
+                        help='棋盘格方格边长（米）(默认: 0.06)')
+
+    # === 自动标定参数 ===
+    parser.add_argument('--no-auto', action='store_true',
+                        help='禁用自动标定（启用手动模式）')
+    parser.add_argument('--stable-frames', type=int, default=5,
+                        help='稳定检测帧数 (默认: 5)')
+    parser.add_argument('--min-distance', type=float, default=0.5,
+                        help='最小位置变化阈值（米）(默认: 0.5)')
+    parser.add_argument('--min-rotation', type=float, default=5.0,
+                        help='最小角度变化阈值（度）(默认: 5.0)')
+
+    # === 图像显示参数 ===
+    parser.add_argument('--no-display', action='store_true',
+                        help='禁用图像显示窗口（无头模式）')
+
+    # === 标定板位置参数（高级） ===
+    parser.add_argument('--front-translation', nargs=3, type=float,
+                        default=[1.255, -0.148, -0.505],
+                        metavar=('X', 'Y', 'Z'),
+                        help='前方棋盘格平移向量 [x, y, z] (默认: 1.255 -0.148 -0.505)')
+    parser.add_argument('--front-rotation', nargs=3, type=float,
+                        default=[90.0, 0.0, 90.0],
+                        metavar=('ROLL', 'PITCH', 'YAW'),
+                        help='前方棋盘格旋转欧拉角 [roll, pitch, yaw] (默认: 90.0 0.0 90.0)')
+    parser.add_argument('--rear-translation', nargs=3, type=float,
+                        default=[-1.255, 0.148, -0.505],
+                        metavar=('X', 'Y', 'Z'),
+                        help='后方棋盘格平移向量 [x, y, z] (默认: -1.255 0.148 -0.505)')
+    parser.add_argument('--rear-rotation', nargs=3, type=float,
+                        default=[90.0, 0.0, -90.0],
+                        metavar=('ROLL', 'PITCH', 'YAW'),
+                        help='后方棋盘格旋转欧拉角 [roll, pitch, yaw] (默认: 90.0 0.0 -90.0)')
+
+    return parser.parse_args()
+
 class ExtrinsicCalibratorWithReporting(Node):
-    def __init__(self):
+    def __init__(self, args):
         super().__init__('agv_extrinsic_calibrator_with_reporting')
 
-        # --- 2. 用户配置：请根据您的实际情况修改 ---
-
-        # === ROS 2 话题 ===
-        # 前方相机话题
-        self.FRONT_IMAGE_TOPIC = '/camera/camera/color/image_raw'       # (修改) 前方相机图像话题
-        self.FRONT_CAMERA_INFO_TOPIC = '/camera/camera/color/camera_info' # (修改) 前方相机信息话题
-
-        # 后方相机话题
-        self.REAR_IMAGE_TOPIC = '/camera/color/image_raw'         # (修改) 后方相机图像话题
-        self.REAR_CAMERA_INFO_TOPIC = '/camera/color/camera_info'   # (修改) 后方相机信息话题
-
-        # === 棋盘格标定板参数 ===
-        self.SQUARES_X = 4       # 棋盘格 X 方向内角点数 (列数-1)
-        self.SQUARES_Y = 3       # 棋盘格 Y 方向内角点数 (行数-1)
-        self.SQUARE_LENGTH = 0.06  # 棋盘格每个方格的边长 (米)
-
-        # === 【关键】手动测量 T_B_to_T (AGV -> 棋盘格) ===
-        # (AGV 坐标系: X-前, Y-左, Z-上)
-
-        # 棋盘格坐标系约定：
-        # X-沿棋盘格水平边向右, Y-沿棋盘格垂直边向下, Z-垂直棋盘格向外
-
-        # ------------------- 前方棋盘格 (用于前方相机) -------------------
-        # A. 平移 (x, y, z) (米) - 从AGV基座到棋盘格原点的距离
-        #    棋盘格原点定义：通常选择左上角内角点作为原点
-        self.FRONT_TRANSLATION_B_to_T = np.array([1.255, -0.148, -0.505])  # 根据实际测量修改
-
-        # B. 旋转 (欧拉角: roll, pitch, yaw) (度)
-        #    roll-绕X轴, pitch-绕Y轴, yaw-绕Z轴
-        #    通常设置为 (0, 0, 0) 如果棋盘格正面朝向AGV前方
-        self.FRONT_EULER_ANGLES_B_to_T = (90.0, 0.0, 90.0)  # 根据实际安装姿态修改
-
-        # ------------------- 后方棋盘格 (用于后方相机) -------------------
-        # A. 平移 (x, y, z) (米)
-        # 注意：后方的x值为负数（位于AGV后方）
-        self.REAR_TRANSLATION_B_to_T = np.array([-1.255, 0.148, -0.505])  # 根据实际测量修改
-
-        # B. 旋转 (欧拉角: roll, pitch, yaw) (度)
-        # 如果棋盘格正面朝向后方的AGV后方，可能需要180度旋转
-        self.REAR_EULER_ANGLES_B_to_T = (90.0, 0.0, -90.0)  # 根据实际安装姿态修改
+        # 参数必须从命令行解析或手动提供，确保一致性
+        if args is None:
+            raise ValueError(
+                "参数不能为None。请使用 parse_arguments() 解析命令行参数，"
+                "或手动构造参数对象。"
+            )
 
         # === 数据管理和报告配置 ===
-        self.DEVICE_ID = os.environ.get('DEVICE_ID', 'AGV_001')  # 设备ID，从环境变量获取或使用默认值
-        self.OPERATOR = os.environ.get('OPERATOR', getpass.getuser())  # 操作员，从环境变量获取或使用当前用户名
-        self.BASE_OUTPUT_DIR = os.environ.get('CALIBRATION_OUTPUT_DIR', './calibration_results')  # 标定结果输出目录
+        self.DEVICE_ID = args.device_id  # 设备ID
+        self.OPERATOR = args.operator    # 操作员
+        self.BASE_OUTPUT_DIR = args.output_dir  # 标定结果输出目录
 
         # 创建输出目录结构
         self.OUTPUT_DIR = os.path.join(self.BASE_OUTPUT_DIR, self.DEVICE_ID, datetime.now().strftime('%Y%m%d_%H%M%S'))
@@ -101,6 +166,33 @@ class ExtrinsicCalibratorWithReporting(Node):
 
         # 初始化日志文件
         self.init_log_file()
+
+        # === ROS 2 话题 ===
+        self.FRONT_IMAGE_TOPIC = args.front_image_topic
+        self.FRONT_CAMERA_INFO_TOPIC = args.front_camera_info_topic
+        self.REAR_IMAGE_TOPIC = args.rear_image_topic
+        self.REAR_CAMERA_INFO_TOPIC = args.rear_camera_info_topic
+
+        # === 棋盘格标定板参数 ===
+        self.SQUARES_X = args.squares_x
+        self.SQUARES_Y = args.squares_y
+        self.SQUARE_LENGTH = args.square_size
+
+        # === 自动标定配置 ===
+        self.ENABLE_AUTO_CALIBRATION = not args.no_auto
+        self.AUTO_CALIB_STABLE_FRAMES = args.stable_frames
+        self.AUTO_CALIB_MIN_DISTANCE = args.min_distance
+        self.AUTO_CALIB_MIN_ROTATION = args.min_rotation
+        self.AUTO_CALIB_RETRY_DELAY = 3.0
+
+        # === 图像显示配置 ===
+        self.ENABLE_IMAGE_DISPLAY = not args.no_display
+
+        # === 【关键】手动测量 T_B_to_T (AGV -> 棋盘格) ===
+        self.FRONT_TRANSLATION_B_to_T = np.array(args.front_translation)
+        self.FRONT_EULER_ANGLES_B_to_T = tuple(args.front_rotation)
+        self.REAR_TRANSLATION_B_to_T = np.array(args.rear_translation)
+        self.REAR_EULER_ANGLES_B_to_T = tuple(args.rear_rotation)
 
         # --- 3. 节点内部变量 (无需修改) ---
         self.bridge = CvBridge()
@@ -117,6 +209,11 @@ class ExtrinsicCalibratorWithReporting(Node):
         self.front_rvec_C_T = None
         self.front_tvec_C_T = None
         self.front_new_frame = False
+        self.front_corners = None  # 保存角点数据
+        self.front_stable_count = 0  # 稳定检测计数
+        self.front_last_calibrated_pose = None  # 上次标定的位姿
+        self.front_auto_calib_done = False  # 是否已完成自动标定
+        self.front_auto_calib_in_progress = False  # 是否正在自动标定
 
         # 后方相机状态
         self.rear_camera_matrix = None
@@ -127,6 +224,11 @@ class ExtrinsicCalibratorWithReporting(Node):
         self.rear_rvec_C_T = None
         self.rear_tvec_C_T = None
         self.rear_new_frame = False
+        self.rear_corners = None  # 保存角点数据
+        self.rear_stable_count = 0  # 稳定检测计数
+        self.rear_last_calibrated_pose = None  # 上次标定的位姿
+        self.rear_auto_calib_done = False  # 是否已完成自动标定
+        self.rear_auto_calib_in_progress = False  # 是否正在自动标定
 
         # 初始化棋盘格世界坐标点
         self.init_board()
@@ -174,8 +276,9 @@ class ExtrinsicCalibratorWithReporting(Node):
         # 标定结果存储
         self.calibration_results = {}
         self.start_time = datetime.now()
+        self.cameras_calibrated = {}  # 分别保存两个相机的标定结果
 
-        self.get_logger().info(f"--- 棋盘格双相机标定节点 (增强版) 已启动 ---")
+        self.get_logger().info(f"--- 棋盘格双相机标定节点 (增强版 - 支持自动标定) 已启动 ---")
         self.log_to_file("=" * 80)
         self.log_to_file(f"标定开始时间: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         self.log_to_file(f"设备ID: {self.DEVICE_ID}")
@@ -189,9 +292,28 @@ class ExtrinsicCalibratorWithReporting(Node):
         self.get_logger().info(f"监听 {self.FRONT_IMAGE_TOPIC} 上的前方相机图像...")
         self.get_logger().info(f"监听 {self.REAR_IMAGE_TOPIC} 上的后方相机图像...")
         self.get_logger().info(f"输出目录: {self.OUTPUT_DIR}")
+
+        if self.ENABLE_AUTO_CALIBRATION:
+            self.get_logger().info("✅ 自动标定模式: 已启用")
+            self.get_logger().info(f"   稳定检测帧数: {self.AUTO_CALIB_STABLE_FRAMES}")
+            self.get_logger().info(f"   最小位置变化: {self.AUTO_CALIB_MIN_DISTANCE}m")
+            self.get_logger().info(f"   最小角度变化: {self.AUTO_CALIB_MIN_ROTATION}°")
+            self.get_logger().info("   操作提示: 只需放置棋盘格，系统将自动完成标定")
+        else:
+            self.get_logger().info("⚠️  手动标定模式: 自动标定已禁用")
+            self.get_logger().info("   按 'f' 标定前方相机, 按 'r' 标定后方相机")
+
+        if self.ENABLE_IMAGE_DISPLAY:
+            self.get_logger().info("🖥️  图形界面模式: 已启用图像显示")
+            self.get_logger().info("   按 'q' 退出程序")
+        else:
+            self.get_logger().info("🖥️  无头模式: 图像显示已禁用（适用于批量生产）")
+            self.get_logger().info("   标定过程完全自动化，无需人工干预")
+
         self.get_logger().info("棋盘格坐标系: X-右, Y-下, Z-向外")
-        self.get_logger().info("在弹出的窗口中: 按 'f' 标定前方相机, 按 'r' 标定后方相机, 按 'q' 退出.")
-        self.get_logger().info("⚠️  重要：棋盘格必须每次精确放置在同一位置！")
+
+        if not self.ENABLE_AUTO_CALIBRATION:
+            self.get_logger().info("⚠️  重要：棋盘格必须每次精确放置在同一位置！")
 
         # 创建定时器定期检查和显示新图像 (30FPS)
         self.display_timer = self.create_timer(0.033, self.display_frames)
@@ -304,32 +426,43 @@ class ExtrinsicCalibratorWithReporting(Node):
         # --- 执行棋盘格角点检测 ---
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         display_frame = frame.copy()
-        self.front_success = False
-        self.front_rvec_C_T = None
-        self.front_tvec_C_T = None
 
         # 查找棋盘格角点
         ret, corners = cv2.findChessboardCorners(gray, (self.SQUARES_X, self.SQUARES_Y), None)
+
+        self.front_success = False
+        self.front_rvec_C_T = None
+        self.front_tvec_C_T = None
+        self.front_corners = None  # 重置角点
 
         if ret:
             # 亚像素级精化 - 提高角点精度
             criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
             corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+            self.front_corners = corners.copy()  # 保存角点数据
 
             # 绘制检测到的角点
             cv2.drawChessboardCorners(display_frame, (self.SQUARES_X, self.SQUARES_Y), corners, ret)
 
             # 估计棋盘格位姿 (T_C_to_T: 相机 -> 棋盘格)
-            self.front_success, self.front_rvec_C_T, self.front_tvec_C_T = cv2.solvePnP(
+            success, rvec, tvec = cv2.solvePnP(
                 self.board, corners, self.front_camera_matrix, self.front_dist_coeffs)
 
-            if self.front_success:
+            if success:
+                self.front_success = True
+                self.front_rvec_C_T = rvec
+                self.front_tvec_C_T = tvec
+
                 # 绘制坐标轴
                 cv2.drawFrameAxes(display_frame, self.front_camera_matrix, self.front_dist_coeffs,
                                   self.front_rvec_C_T, self.front_tvec_C_T, 0.1)
-                self.get_logger().debug("前方棋盘格检测成功")
+
+                # 自动标定逻辑
+                if self.ENABLE_AUTO_CALIBRATION:
+                    self.handle_auto_calibration('front')
         else:
-            self.get_logger().debug("前方棋盘格未检测到")
+            # 棋盘格丢失，重置稳定计数
+            self.front_stable_count = 0
 
         self.front_frame = display_frame
         self.front_new_frame = True
@@ -349,38 +482,55 @@ class ExtrinsicCalibratorWithReporting(Node):
         # --- 执行棋盘格角点检测 ---
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         display_frame = frame.copy()
-        self.rear_success = False
-        self.rear_rvec_C_T = None
-        self.rear_tvec_C_T = None
 
         # 查找棋盘格角点
         ret, corners = cv2.findChessboardCorners(gray, (self.SQUARES_X, self.SQUARES_Y), None)
+
+        self.rear_success = False
+        self.rear_rvec_C_T = None
+        self.rear_tvec_C_T = None
+        self.rear_corners = None  # 重置角点
 
         if ret:
             # 亚像素级精化 - 提高角点精度
             criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
             corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+            self.rear_corners = corners.copy()  # 保存角点数据
 
             # 绘制检测到的角点
             cv2.drawChessboardCorners(display_frame, (self.SQUARES_X, self.SQUARES_Y), corners, ret)
 
             # 估计棋盘格位姿 (T_C_to_T: 相机 -> 棋盘格)
-            self.rear_success, self.rear_rvec_C_T, self.rear_tvec_C_T = cv2.solvePnP(
+            success, rvec, tvec = cv2.solvePnP(
                 self.board, corners, self.rear_camera_matrix, self.rear_dist_coeffs)
 
-            if self.rear_success:
+            if success:
+                self.rear_success = True
+                self.rear_rvec_C_T = rvec
+                self.rear_tvec_C_T = tvec
+
                 # 绘制坐标轴
                 cv2.drawFrameAxes(display_frame, self.rear_camera_matrix, self.rear_dist_coeffs,
                                   self.rear_rvec_C_T, self.rear_tvec_C_T, 0.1)
-                self.get_logger().debug("后方棋盘格检测成功")
+
+                # 自动标定逻辑
+                if self.ENABLE_AUTO_CALIBRATION:
+                    self.handle_auto_calibration('rear')
         else:
-            self.get_logger().debug("后方棋盘格未检测到")
+            # 棋盘格丢失，重置稳定计数
+            self.rear_stable_count = 0
 
         self.rear_frame = display_frame
         self.rear_new_frame = True
 
     def display_frames(self):
         """显示两个相机的图像并进行按键处理"""
+        if not self.ENABLE_IMAGE_DISPLAY:
+            # 图像显示已禁用，无头模式运行
+            # 仅记录日志，不显示图像窗口
+            return
+
+        # 原有的图像显示逻辑
         key = None
         need_key_check = False
 
@@ -399,8 +549,25 @@ class ExtrinsicCalibratorWithReporting(Node):
                 cv2.putText(label_frame, "Place chessboard", (10, 90), cv2.FONT_HERSHEY_SIMPLEX,
                            0.7, (0, 0, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(label_frame, "Press 'f' to calibrate", (10, label_frame.shape[0] - 10),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
+            if self.ENABLE_AUTO_CALIBRATION:
+                if self.front_auto_calib_done:
+                    cv2.putText(label_frame, "Auto Calibrated!", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.putText(label_frame, "Press 'f' to recalibrate", (10, label_frame.shape[0] - 10),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2, cv2.LINE_AA)
+                elif self.front_auto_calib_in_progress:
+                    cv2.putText(label_frame, "Auto Calibrating...", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 255), 2, cv2.LINE_AA)
+                elif self.front_stable_count > 0:
+                    cv2.putText(label_frame, f"Stable: {self.front_stable_count}/{self.AUTO_CALIB_STABLE_FRAMES}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 255), 2, cv2.LINE_AA)
+                else:
+                    cv2.putText(label_frame, "Auto mode active", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (255, 255, 0), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(label_frame, "Press 'f' to calibrate", (10, label_frame.shape[0] - 10),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
+
             cv2.imshow("Front Camera", label_frame)
             self.front_new_frame = False
             need_key_check = True
@@ -420,8 +587,25 @@ class ExtrinsicCalibratorWithReporting(Node):
                 cv2.putText(label_frame, "Place chessboard", (10, 90), cv2.FONT_HERSHEY_SIMPLEX,
                            0.7, (0, 0, 255), 2, cv2.LINE_AA)
 
-            cv2.putText(label_frame, "Press 'r' to calibrate", (10, label_frame.shape[0] - 10),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
+            if self.ENABLE_AUTO_CALIBRATION:
+                if self.rear_auto_calib_done:
+                    cv2.putText(label_frame, "Auto Calibrated!", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.putText(label_frame, "Press 'r' to recalibrate", (10, label_frame.shape[0] - 10),
+                               cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2, cv2.LINE_AA)
+                elif self.rear_auto_calib_in_progress:
+                    cv2.putText(label_frame, "Auto Calibrating...", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 255), 2, cv2.LINE_AA)
+                elif self.rear_stable_count > 0:
+                    cv2.putText(label_frame, f"Stable: {self.rear_stable_count}/{self.AUTO_CALIB_STABLE_FRAMES}", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (0, 255, 255), 2, cv2.LINE_AA)
+                else:
+                    cv2.putText(label_frame, "Auto mode active", (10, 120), cv2.FONT_HERSHEY_SIMPLEX,
+                               0.6, (255, 255, 0), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(label_frame, "Press 'r' to calibrate", (10, label_frame.shape[0] - 10),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2, cv2.LINE_AA)
+
             cv2.imshow("Rear Camera", label_frame)
             self.rear_new_frame = False
             need_key_check = True
@@ -435,22 +619,41 @@ class ExtrinsicCalibratorWithReporting(Node):
                     self.get_logger().warn("前方相机标定失败：当前帧未检测到棋盘格。")
                     self.log_to_file("[WARN] 前方相机标定失败：当前帧未检测到棋盘格。")
                 else:
-                    self.get_logger().info("[计算中...] 前方相机检测到棋盘格，开始计算外参...")
-                    self.log_to_file("[INFO] 开始前方相机标定...")
+                    # 手动按键触发标定（无论是自动还是手动模式）
+                    calib_type = "[手动]" if not self.ENABLE_AUTO_CALIBRATION else "[重新标定]"
+                    self.get_logger().info(f"{calib_type} 前方相机检测到棋盘格，开始计算外参和重投影误差...")
+                    self.log_to_file(f"[{calib_type.strip('[]')}] 开始前方相机标定")
+
+                    # 重置自动标定状态，允许重新标定
+                    if self.ENABLE_AUTO_CALIBRATION:
+                        self.front_auto_calib_done = False
+                        self.front_stable_count = 0
+                        self.front_last_calibrated_pose = None
+
                     self.calibrate_camera('front')
             elif key == ord('r'):
                 if not self.rear_success or self.rear_rvec_C_T is None or self.rear_tvec_C_T is None:
                     self.get_logger().warn("后方相机标定失败：当前帧未检测到棋盘格。")
                     self.log_to_file("[WARN] 后方相机标定失败：当前帧未检测到棋盘格。")
                 else:
-                    self.get_logger().info("[计算中...] 后方相机检测到棋盘格，开始计算外参...")
-                    self.log_to_file("[INFO] 开始后方相机标定...")
+                    # 手动按键触发标定（无论是自动还是手动模式）
+                    calib_type = "[手动]" if not self.ENABLE_AUTO_CALIBRATION else "[重新标定]"
+                    self.get_logger().info(f"{calib_type} 后方相机检测到棋盘格，开始计算外参和重投影误差...")
+                    self.log_to_file(f"[{calib_type.strip('[]')}] 开始后方相机标定")
+
+                    # 重置自动标定状态，允许重新标定
+                    if self.ENABLE_AUTO_CALIBRATION:
+                        self.rear_auto_calib_done = False
+                        self.rear_stable_count = 0
+                        self.rear_last_calibrated_pose = None
+
                     self.calibrate_camera('rear')
             elif key == ord('q'):
                 self.get_logger().info("收到退出请求...")
                 self.log_to_file("[INFO] 收到退出请求")
                 self.on_shutdown()
-                cv2.destroyAllWindows()
+                if self.ENABLE_IMAGE_DISPLAY:
+                    cv2.destroyAllWindows()
                 self.destroy_node()
                 rclpy.shutdown()
 
@@ -485,12 +688,16 @@ class ExtrinsicCalibratorWithReporting(Node):
         # c. 核心公式：T_B_C = T_B_T * T_T_C
         T_B_to_C = T_B_to_T @ T_T_to_C
 
-        # d. 打印结果并保存
-        calibration_time = datetime.now()
-        self.print_calibration_results(T_B_to_C, camera_label, camera_name, calibration_time)
-        self.save_calibration_results(T_B_to_C, camera_name, calibration_time)
+        # d. 计算重投影误差
+        reprojection_error = self.calculate_reprojection_error(
+            rvec_C_T, tvec_C_T, camera_matrix, dist_coeffs, camera_name)
 
-    def print_calibration_results(self, T_B_C, camera_label="", camera_name="", calibration_time=None):
+        # e. 打印结果并保存
+        calibration_time = datetime.now()
+        self.print_calibration_results(T_B_to_C, camera_label, camera_name, calibration_time, reprojection_error)
+        self.save_calibration_results(T_B_to_C, camera_name, calibration_time, reprojection_error)
+
+    def print_calibration_results(self, T_B_C, camera_label="", camera_name="", calibration_time=None, reprojection_error=None):
         """以 ROS Logger 的形式打印最终的外参矩阵"""
         R_B_C = T_B_C[:3, :3]
         t_B_C = T_B_C[:3, 3]
@@ -516,6 +723,16 @@ class ExtrinsicCalibratorWithReporting(Node):
         self.get_logger().info(f"--- 旋转 (四元数) [x, y, z, w] ---")
         self.get_logger().info(f"  {quat_xyzw}\n")
 
+        # 显示重投影误差
+        if reprojection_error is not None:
+            self.get_logger().info(f"--- 重投影误差 (Reprojection Error) ---")
+            self.get_logger().info(f"  RMS误差: %.4f 像素" % reprojection_error['rms'])
+            self.get_logger().info(f"  平均误差: %.4f 像素" % reprojection_error['mean'])
+            self.get_logger().info(f"  最大误差: %.4f 像素" % reprojection_error['max'])
+            self.get_logger().info(f"  最小误差: %.4f 像素" % reprojection_error['min'])
+            self.get_logger().info(f"  标准差: %.4f 像素" % reprojection_error['std'])
+            self.get_logger().info("  (通常 < 0.5 像素表示优秀，< 1.0 像素表示良好)\n")
+
         self.get_logger().info("--- 用于 static_transform_publisher (ROS 2) 的参数 ---")
         self.get_logger().info(f"ros2 run tf2_ros static_transform_publisher {t_B_C[0]} {t_B_C[1]} {t_B_C[2]} {quat_xyzw[0]} {quat_xyzw[1]} {quat_xyzw[2]} {quat_xyzw[3]} base_link {camera_name}_camera_link")
         self.get_logger().info(f"--- {camera_label}相机标定结束 ---\n")
@@ -532,12 +749,21 @@ class ExtrinsicCalibratorWithReporting(Node):
         self.log_to_file(f"  {euler_xyz}")
         self.log_to_file(f"\n--- 旋转 (四元数) [x, y, z, w] ---")
         self.log_to_file(f"  {quat_xyzw}")
+
+        if reprojection_error is not None:
+            self.log_to_file(f"\n--- 重投影误差 (Reprojection Error) ---")
+            self.log_to_file(f"  RMS误差: {reprojection_error['rms']:.4f} 像素")
+            self.log_to_file(f"  平均误差: {reprojection_error['mean']:.4f} 像素")
+            self.log_to_file(f"  最大误差: {reprojection_error['max']:.4f} 像素")
+            self.log_to_file(f"  最小误差: {reprojection_error['min']:.4f} 像素")
+            self.log_to_file(f"  标准差: {reprojection_error['std']:.4f} 像素")
+
         self.log_to_file(f"\n--- ROS 2 static_transform_publisher 命令 ---")
         self.log_to_file(f"ros2 run tf2_ros static_transform_publisher {t_B_C[0]} {t_B_C[1]} {t_B_C[2]} {quat_xyzw[0]} {quat_xyzw[1]} {quat_xyzw[2]} {quat_xyzw[3]} base_link {camera_name}_camera_link")
         self.log_to_file(f"{'='*80}\n")
 
-    def save_calibration_results(self, T_B_C, camera_name, calibration_time):
-        """保存标定结果到多种格式的文件"""
+    def save_calibration_results(self, T_B_C, camera_name, calibration_time, reprojection_error=None):
+        """保存标定结果到内存，最终统一保存"""
         try:
             R_B_C = T_B_C[:3, :3]
             t_B_C = T_B_C[:3, 3]
@@ -545,6 +771,20 @@ class ExtrinsicCalibratorWithReporting(Node):
             r = Rotation.from_matrix(R_B_C)
             euler_xyz = r.as_euler('xyz', degrees=True)
             quat_xyzw = r.as_quat()
+
+            # 确保所有numpy类型都转换为Python原生类型
+            def to_python_type(obj):
+                """将numpy类型转换为Python原生类型"""
+                if isinstance(obj, np.ndarray):
+                    return [float(x) if isinstance(x, (np.floating, np.integer)) else x for x in obj.tolist()]
+                elif isinstance(obj, (np.floating, np.integer)):
+                    return float(obj) if isinstance(obj, np.floating) else int(obj)
+                elif isinstance(obj, list):
+                    return [to_python_type(x) for x in obj]
+                elif isinstance(obj, tuple):
+                    return tuple(to_python_type(x) for x in obj)
+                else:
+                    return obj
 
             # 构建结果数据
             result_data = {
@@ -560,76 +800,345 @@ class ExtrinsicCalibratorWithReporting(Node):
                     'board_square_length': self.SQUARE_LENGTH
                 },
                 'transform_matrix': {
-                    '4x4_matrix': T_B_C.tolist(),
-                    'rotation_matrix': R_B_C.tolist(),
-                    'translation': t_B_C.tolist()
+                    '4x4_matrix': to_python_type(T_B_C.tolist()),
+                    'rotation_matrix': to_python_type(R_B_C.tolist()),
+                    'translation': to_python_type(t_B_C.tolist())
                 },
                 'rotation': {
-                    'euler_xyz_deg': euler_xyz.tolist(),
-                    'quaternion_xyzw': quat_xyzw.tolist()
+                    'euler_xyz_deg': to_python_type(euler_xyz.tolist()),
+                    'quaternion_xyzw': to_python_type(quat_xyzw.tolist())
+                },
+                'quality_metrics': {
+                    'reprojection_error': reprojection_error if reprojection_error else None,
+                    'quality_assessment': self.assess_calibration_quality(reprojection_error)
                 },
                 'ros2_command': {
                     'static_transform_publisher': f"ros2 run tf2_ros static_transform_publisher {t_B_C[0]} {t_B_C[1]} {t_B_C[2]} {quat_xyzw[0]} {quat_xyzw[1]} {quat_xyzw[2]} {quat_xyzw[3]} base_link {camera_name}_camera_link"
                 }
             }
 
-            # 保存到 JSON
-            with open(self.JSON_REPORT_FILE, 'w', encoding='utf-8') as f:
-                json.dump(result_data, f, indent=2, ensure_ascii=False)
-            self.log_to_file(f"[INFO] JSON报告已保存到: {self.JSON_REPORT_FILE}")
+            # 保存到内存中
+            self.cameras_calibrated[camera_name] = result_data
 
-            # 保存到 YAML
-            with open(self.YAML_REPORT_FILE, 'w', encoding='utf-8') as f:
-                yaml.dump(result_data, f, default_flow_style=False, allow_unicode=True)
-            self.log_to_file(f"[INFO] YAML报告已保存到: {self.YAML_REPORT_FILE}")
+            self.get_logger().info(f"✅ {camera_name}相机标定结果已暂存！")
+            self.get_logger().info(f"   已标定相机: {list(self.cameras_calibrated.keys())}")
 
-            # 保存相机参数文件 (ROS 2格式)
-            camera_params = {
-                f'{camera_name}_camera': {
-                    'camera_matrix': self.front_camera_matrix.tolist() if camera_name == 'front' else self.rear_camera_matrix.tolist(),
-                    'distortion_coefficients': self.front_dist_coeffs.tolist() if camera_name == 'front' else self.rear_dist_coeffs.tolist(),
-                    'image_width': self.calibration_results['camera_params']['front']['width'] if camera_name == 'front' else self.calibration_results['camera_params']['rear']['width'],
-                    'image_height': self.calibration_results['camera_params']['front']['height'] if camera_name == 'front' else self.calibration_results['camera_params']['rear']['height']
+            # 如果两个相机都标定完成，立即保存文件
+            if len(self.cameras_calibrated) == 2:
+                self.log_to_file("[INFO] 两个相机都已标定完成，开始保存最终文件...")
+                self.save_all_results_to_files()
+
+        except Exception as e:
+            self.get_logger().error(f"保存{camera_name}相机标定结果失败: {e}")
+            self.log_to_file(f"[ERROR] 保存{camera_name}相机标定结果失败: {e}")
+
+    def save_all_results_to_files(self):
+        """将所有相机的标定结果保存到文件"""
+        try:
+            # 构建包含两个相机数据的完整报告
+            full_report = {
+                'metadata': {
+                    'device_id': self.DEVICE_ID,
+                    'operator': self.OPERATOR,
+                    'hostname': socket.gethostname(),
+                    'calibration_start_time': self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                    'calibration_end_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                    'calibrated_cameras': list(self.cameras_calibrated.keys()),
+                    'total_cameras': 2,
+                    'calibration_method': 'chessboard'
                 },
-                'extrinsic_parameters': {
-                    'rotation_matrix': R_B_C.tolist(),
-                    'translation': t_B_C.tolist(),
-                    'euler_angles_deg': euler_xyz.tolist(),
-                    'quaternion_xyzw': quat_xyzw.tolist(),
-                    'static_transform_publisher': f"ros2 run tf2_ros static_transform_publisher {t_B_C[0]} {t_B_C[1]} {t_B_C[2]} {quat_xyzw[0]} {quat_xyzw[1]} {quat_xyzw[2]} {quat_xyzw[3]} base_link {camera_name}_camera_link"
+                'cameras': {}
+            }
+
+            # 添加每个相机的数据
+            for camera_name, camera_data in self.cameras_calibrated.items():
+                full_report['cameras'][camera_name] = camera_data
+
+            # 保存到 JSON（包含所有相机）
+            with open(self.JSON_REPORT_FILE, 'w', encoding='utf-8') as f:
+                json.dump(full_report, f, indent=2, ensure_ascii=False)
+            self.log_to_file(f"[INFO] 完整JSON报告已保存到: {self.JSON_REPORT_FILE}")
+
+            # 保存到 YAML（包含所有相机）
+            with open(self.YAML_REPORT_FILE, 'w', encoding='utf-8') as f:
+                yaml.dump(full_report, f, default_flow_style=False, allow_unicode=True)
+            self.log_to_file(f"[INFO] 完整YAML报告已保存到: {self.YAML_REPORT_FILE}")
+
+            # 保存相机参数文件（ROS 2格式，包含所有相机）
+            camera_params_file = {
+                'metadata': {
+                    'device_id': self.DEVICE_ID,
+                    'calibration_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
             }
 
-            # 如果是第一个相机，保存初始文件；如果是第二个，合并保存
-            if camera_name == 'front':
-                with open(self.CAMERA_PARAMS_FILE, 'w', encoding='utf-8') as f:
-                    yaml.dump(camera_params, f, default_flow_style=False, allow_unicode=True)
-            else:
-                # 读取现有文件并更新
-                try:
-                    with open(self.CAMERA_PARAMS_FILE, 'r', encoding='utf-8') as f:
-                        existing_params = yaml.safe_load(f)
-                except:
-                    existing_params = {}
+            # 为每个相机添加参数
+            for camera_name, camera_data in self.cameras_calibrated.items():
+                # 安全地获取相机参数信息
+                camera_params = None
+                if 'camera_params' in self.calibration_results and camera_name in self.calibration_results['camera_params']:
+                    camera_params = self.calibration_results['camera_params'][camera_name]
 
-                existing_params.update(camera_params)
-                with open(self.CAMERA_PARAMS_FILE, 'w', encoding='utf-8') as f:
-                    yaml.dump(existing_params, f, default_flow_style=False, allow_unicode=True)
+                camera_params_file[f'{camera_name}_camera'] = {
+                    'camera_matrix': self.front_camera_matrix.tolist() if camera_name == 'front' else self.rear_camera_matrix.tolist(),
+                    'distortion_coefficients': self.front_dist_coeffs.tolist() if camera_name == 'front' else self.rear_dist_coeffs.tolist(),
+                    'image_width': camera_params['width'] if camera_params else 0,
+                    'image_height': camera_params['height'] if camera_params else 0
+                }
 
+                camera_params_file[f'{camera_name}_extrinsic_parameters'] = {
+                    'transform_matrix': camera_data['transform_matrix']['4x4_matrix'],
+                    'rotation_matrix': camera_data['transform_matrix']['rotation_matrix'],
+                    'translation': camera_data['transform_matrix']['translation'],
+                    'euler_angles_deg': camera_data['rotation']['euler_xyz_deg'],
+                    'quaternion_xyzw': camera_data['rotation']['quaternion_xyzw'],
+                    'static_transform_publisher': camera_data['ros2_command']['static_transform_publisher'],
+                    'reprojection_error': camera_data['quality_metrics']['reprojection_error'],
+                    'quality_assessment': camera_data['quality_metrics']['quality_assessment']
+                }
+
+            with open(self.CAMERA_PARAMS_FILE, 'w', encoding='utf-8') as f:
+                yaml.dump(camera_params_file, f, default_flow_style=False, allow_unicode=True)
             self.log_to_file(f"[INFO] 相机参数文件已保存到: {self.CAMERA_PARAMS_FILE}")
-            self.get_logger().info(f"✅ 标定结果已自动保存！")
+
+            self.get_logger().info(f"")
+            self.get_logger().info(f"🎉 所有标定结果已保存完成！")
             self.get_logger().info(f"   JSON报告: {self.JSON_REPORT_FILE}")
             self.get_logger().info(f"   YAML报告: {self.YAML_REPORT_FILE}")
             self.get_logger().info(f"   相机参数: {self.CAMERA_PARAMS_FILE}")
+            self.get_logger().info(f"   已标定相机: {', '.join(self.cameras_calibrated.keys())}")
+            self.get_logger().info(f"")
 
         except Exception as e:
-            self.get_logger().error(f"保存标定结果失败: {e}")
-            self.log_to_file(f"[ERROR] 保存标定结果失败: {e}")
+            self.get_logger().error(f"保存最终文件失败: {e}")
+            self.log_to_file(f"[ERROR] 保存最终文件失败: {e}")
+
+    def calculate_reprojection_error(self, rvec, tvec, camera_matrix, dist_coeffs, camera_name):
+        """计算重投影误差以评估标定质量"""
+        try:
+            # 获取保存的角点数据
+            if camera_name == 'front':
+                corners = self.front_corners
+            else:
+                corners = self.rear_corners
+
+            if corners is None:
+                self.get_logger().warn(f"无法获取{camera_name}相机的角点数据，重投影误差计算失败")
+                self.log_to_file(f"[WARN] 无法获取{camera_name}相机的角点数据")
+                return None
+
+            # 计算重投影点
+            imgpoints, _ = cv2.projectPoints(
+                self.board,
+                rvec,
+                tvec,
+                camera_matrix,
+                dist_coeffs
+            )
+
+            # 计算误差
+            errors = []
+            for i in range(len(corners)):
+                # 实际检测到的点
+                point_detected = corners[i].ravel()
+                # 重投影的点
+                point_projected = imgpoints[i].ravel()
+
+                # 计算欧氏距离
+                error = np.sqrt((point_detected[0] - point_projected[0])**2 +
+                              (point_detected[1] - point_projected[1])**2)
+                errors.append(error)
+
+            errors = np.array(errors)
+
+            # 计算统计信息
+            reprojection_error_data = {
+                'rms': float(np.sqrt(np.mean(errors**2))),  # RMS误差 (转换为Python float)
+                'mean': float(np.mean(errors)),  # 平均误差 (转换为Python float)
+                'max': float(np.max(errors)),  # 最大误差 (转换为Python float)
+                'min': float(np.min(errors)),  # 最小误差 (转换为Python float)
+                'std': float(np.std(errors)),  # 标准差 (转换为Python float)
+                'num_points': int(len(errors)),  # 角点数量 (转换为Python int)
+                'all_errors': [float(e) for e in errors.tolist()]  # 所有误差值 (转换为Python float)
+            }
+
+            self.log_to_file(f"[INFO] {camera_name}相机重投影误差计算完成:")
+            self.log_to_file(f"  RMS: {reprojection_error_data['rms']:.4f} 像素")
+            self.log_to_file(f"  平均: {reprojection_error_data['mean']:.4f} 像素")
+            self.log_to_file(f"  标准差: {reprojection_error_data['std']:.4f} 像素")
+
+            return reprojection_error_data
+
+        except Exception as e:
+            self.get_logger().error(f"计算重投影误差失败: {e}")
+            self.log_to_file(f"[ERROR] 计算重投影误差失败: {e}")
+            return None
+
+    def assess_calibration_quality(self, reprojection_error):
+        """评估标定质量"""
+        if reprojection_error is None:
+            return "无法评估（重投影误差计算失败）"
+
+        rms = reprojection_error['rms']
+
+        if rms < 0.3:
+            return {
+                'grade': '优秀',
+                'description': '重投影误差非常小，标定质量极佳',
+                'passed': True
+            }
+        elif rms < 0.5:
+            return {
+                'grade': '良好',
+                'description': '重投影误差较小，标定质量良好',
+                'passed': True
+            }
+        elif rms < 1.0:
+            return {
+                'grade': '可接受',
+                'description': '重投影误差在可接受范围内',
+                'passed': True
+            }
+        elif rms < 2.0:
+            return {
+                'grade': '警告',
+                'description': '重投影误差较大，建议重新标定',
+                'passed': False
+            }
+        else:
+            return {
+                'grade': '不合格',
+                'description': '重投影误差过大，标定结果不可靠，必须重新标定',
+                'passed': False
+            }
+
+    def handle_auto_calibration(self, camera_name):
+        """处理自动标定逻辑"""
+        # 定义相机关联的属性名映射，提高代码可读性
+        camera_attributes = {
+            'front': {
+                'success': 'front_success',
+                'rvec': 'front_rvec_C_T',
+                'tvec': 'front_tvec_C_T',
+                'stable_count': 'front_stable_count',
+                'last_pose': 'front_last_calibrated_pose',
+                'auto_calib_done': 'front_auto_calib_done',
+                'auto_calib_in_progress': 'front_auto_calib_in_progress'
+            },
+            'rear': {
+                'success': 'rear_success',
+                'rvec': 'rear_rvec_C_T',
+                'tvec': 'rear_tvec_C_T',
+                'stable_count': 'rear_stable_count',
+                'last_pose': 'rear_last_calibrated_pose',
+                'auto_calib_done': 'rear_auto_calib_done',
+                'auto_calib_in_progress': 'rear_auto_calib_in_progress'
+            }
+        }
+
+        # 获取相机的属性映射
+        attr_map = camera_attributes[camera_name]
+
+        # 获取相机状态变量
+        success = getattr(self, attr_map['success'])
+        rvec = getattr(self, attr_map['rvec'])
+        tvec = getattr(self, attr_map['tvec'])
+
+        # 检查是否已经完成自动标定
+        if getattr(self, attr_map['auto_calib_done']):
+            return
+
+        # 检查是否正在标定
+        if getattr(self, attr_map['auto_calib_in_progress']):
+            return
+
+        # 增加稳定计数
+        current_stable_count = getattr(self, attr_map['stable_count']) + 1
+        setattr(self, attr_map['stable_count'], current_stable_count)
+
+        self.get_logger().debug(f"{camera_name}相机稳定计数: {current_stable_count}/{self.AUTO_CALIB_STABLE_FRAMES}")
+
+        # 检查是否达到稳定阈值
+        if current_stable_count >= self.AUTO_CALIB_STABLE_FRAMES:
+            # 检查位姿变化
+            current_pose = np.concatenate([rvec.flatten(), tvec.flatten()])
+            last_pose = getattr(self, attr_map['last_pose'])
+
+            if last_pose is not None:
+                # 计算位姿变化
+                pose_changed = self.is_pose_significantly_changed(
+                    last_pose, current_pose,
+                    self.AUTO_CALIB_MIN_DISTANCE,
+                    self.AUTO_CALIB_MIN_ROTATION
+                )
+            else:
+                # 第一次标定
+                pose_changed = True
+
+            if pose_changed:
+                self.get_logger().info(f"[自动标定] {camera_name}相机检测到稳定的棋盘格，开始自动标定...")
+                self.log_to_file(f"[AUTO-CALIB] 开始{camera_name}相机自动标定")
+
+                # 标记为正在标定
+                setattr(self, attr_map['auto_calib_in_progress'], True)
+
+                # 执行标定
+                self.calibrate_camera(camera_name)
+
+                # 标记为已完成自动标定
+                setattr(self, attr_map['auto_calib_done'], True)
+                setattr(self, attr_map['auto_calib_in_progress'], False)
+
+                # 保存当前位姿作为参考
+                setattr(self, attr_map['last_pose'], current_pose)
+
+                self.get_logger().info(f"[自动标定] {camera_name}相机自动标定完成！")
+                self.log_to_file(f"[AUTO-CALIB] {camera_name}相机自动标定完成")
+            else:
+                self.get_logger().info(f"[自动标定] {camera_name}相机位姿未显著变化，跳过标定")
+                self.log_to_file(f"[AUTO-CALIB] {camera_name}相机位姿未变化，跳过标定")
+                # 重置稳定计数，允许重新检测
+                setattr(self, attr_map['stable_count'], 0)
+
+    def is_pose_significantly_changed(self, pose1, pose2, min_distance, min_rotation_deg):
+        """检查两个位姿是否有显著变化"""
+        # 提取平移向量（前3个是rvec，后3个是tvec）
+        rvec1, tvec1 = pose1[:3], pose1[3:]
+        rvec2, tvec2 = pose2[:3], pose2[3:]
+
+        # 计算平移变化
+        translation_change = np.linalg.norm(tvec2 - tvec1)
+
+        # 计算旋转变化
+        R1, _ = cv2.Rodrigues(rvec1)
+        R2, _ = cv2.Rodrigues(rvec2)
+        R_relative = R2 @ R1.T
+
+        # 转换为四元数计算旋转角
+        r = Rotation.from_matrix(R_relative)
+        rotation_change_rad = np.abs(r.as_rotvec()).mean()
+        rotation_change_deg = np.rad2deg(rotation_change_rad)
+
+        # 判断是否超过阈值
+        translation_changed = translation_change > min_distance
+        rotation_changed = rotation_change_deg > min_rotation_deg
+
+        self.get_logger().debug(
+            f"位姿变化 - 平移: {translation_change:.3f}m (阈值: {min_distance}m), "
+            f"旋转: {rotation_change_deg:.2f}° (阈值: {min_rotation_deg}°)"
+        )
+
+        return translation_changed or rotation_changed
 
     def on_shutdown(self):
         """程序退出时保存汇总信息"""
         end_time = datetime.now()
         duration = end_time - self.start_time
+
+        # 如果有相机标定结果但还未保存文件，则立即保存
+        if self.cameras_calibrated and len(self.cameras_calibrated) > 0:
+            self.log_to_file("[INFO] 程序退出，正在保存标定结果...")
+            self.save_all_results_to_files()
 
         summary = {
             'summary': {
@@ -639,7 +1148,7 @@ class ExtrinsicCalibratorWithReporting(Node):
                 'end_time': end_time.strftime('%Y-%m-%d %H:%M:%S'),
                 'duration_seconds': duration.total_seconds(),
                 'output_directory': self.OUTPUT_DIR,
-                'calibrated_cameras': list(self.calibration_results.keys()) if 'camera_params' in self.calibration_results else []
+                'calibrated_cameras': list(self.cameras_calibrated.keys())
             }
         }
 
@@ -654,18 +1163,27 @@ class ExtrinsicCalibratorWithReporting(Node):
             self.log_to_file(f"结束时间: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
             self.log_to_file(f"总耗时: {duration.total_seconds():.2f} 秒")
             self.log_to_file(f"输出目录: {self.OUTPUT_DIR}")
+            self.log_to_file(f"已标定相机: {list(self.cameras_calibrated.keys())}")
             self.log_to_file(f"{'='*80}")
 
             self.get_logger().info(f"\n✅ 标定会话结束")
             self.get_logger().info(f"总耗时: {duration.total_seconds():.2f} 秒")
+            if self.cameras_calibrated:
+                self.get_logger().info(f"已标定相机: {', '.join(self.cameras_calibrated.keys())}")
             self.get_logger().info(f"所有结果已保存到: {self.OUTPUT_DIR}")
 
         except Exception as e:
             self.get_logger().error(f"保存汇总信息失败: {e}")
 
 def main(args=None):
+    # 解析命令行参数
+    parsed_args = parse_arguments()
+
     rclpy.init(args=args)
-    node = ExtrinsicCalibratorWithReporting()
+
+    # 创建节点时传入解析后的参数
+    node = ExtrinsicCalibratorWithReporting(parsed_args)
+
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
@@ -678,7 +1196,8 @@ def main(args=None):
             node.on_shutdown()
             node.destroy_node()
             rclpy.shutdown()
-        cv2.destroyAllWindows()
+        if node.ENABLE_IMAGE_DISPLAY:
+            cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main()
