@@ -830,10 +830,9 @@ class ExtrinsicCalibratorWithReporting(Node):
             self.get_logger().info(f"✅ {camera_name}相机标定结果已暂存！")
             self.get_logger().info(f"   已标定相机: {list(self.cameras_calibrated.keys())}")
 
-            # 如果两个相机都标定完成，立即保存文件
-            if len(self.cameras_calibrated) == 2:
-                self.log_to_file("[INFO] 两个相机都已标定完成，开始保存最终文件...")
-                self.save_all_results_to_files()
+            # 单个相机标定完成即保存文件（无需等待两个相机都完成）
+            self.log_to_file(f"[INFO] {camera_name}相机标定完成，开始保存结果文件...")
+            self.save_all_results_to_files()
 
         except Exception as e:
             self.get_logger().error(f"保存{camera_name}相机标定结果失败: {e}")
@@ -842,7 +841,7 @@ class ExtrinsicCalibratorWithReporting(Node):
     def save_all_results_to_files(self):
         """将所有相机的标定结果保存到文件"""
         try:
-            # 构建包含两个相机数据的完整报告
+            # 构建包含已标定相机数据的完整报告
             full_report = {
                 'metadata': {
                     'device_id': self.DEVICE_ID,
@@ -851,7 +850,7 @@ class ExtrinsicCalibratorWithReporting(Node):
                     'calibration_start_time': self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
                     'calibration_end_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'calibrated_cameras': list(self.cameras_calibrated.keys()),
-                    'total_cameras': 2,
+                    'total_cameras': len(self.cameras_calibrated),  # 动态设置实际标定的相机数量
                     'calibration_method': 'chessboard'
                 },
                 'cameras': {}
@@ -909,11 +908,11 @@ class ExtrinsicCalibratorWithReporting(Node):
             self.log_to_file(f"[INFO] 相机参数文件已保存到: {self.CAMERA_PARAMS_FILE}")
 
             self.get_logger().info(f"")
-            self.get_logger().info(f"🎉 所有标定结果已保存完成！")
+            self.get_logger().info(f"🎉 标定结果已保存完成！")
             self.get_logger().info(f"   JSON报告: {self.JSON_REPORT_FILE}")
             self.get_logger().info(f"   YAML报告: {self.YAML_REPORT_FILE}")
             self.get_logger().info(f"   相机参数: {self.CAMERA_PARAMS_FILE}")
-            self.get_logger().info(f"   已标定相机: {', '.join(self.cameras_calibrated.keys())}")
+            self.get_logger().info(f"   本次已标定相机: {', '.join(self.cameras_calibrated.keys())}")
             self.get_logger().info(f"")
 
         except Exception as e:
@@ -1142,9 +1141,9 @@ class ExtrinsicCalibratorWithReporting(Node):
         end_time = datetime.now()
         duration = end_time - self.start_time
 
-        # 如果有相机标定结果但还未保存文件，则立即保存
+        # 如果有标定结果，确保最终文件已保存（重复保存可覆盖更新）
         if self.cameras_calibrated and len(self.cameras_calibrated) > 0:
-            self.log_to_file("[INFO] 程序退出，正在保存标定结果...")
+            self.log_to_file("[INFO] 程序退出，正在保存最终标定结果...")
             self.save_all_results_to_files()
 
         summary = {
