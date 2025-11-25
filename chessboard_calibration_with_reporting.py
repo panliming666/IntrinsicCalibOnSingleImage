@@ -90,11 +90,13 @@ def parse_arguments():
     parser.add_argument('--front-camera-info-topic', type=str,
                         default='/camera/camera/color/camera_info',
                         help='前方相机信息话题 (默认: /camera/camera/color/camera_info)')
+    
+
     parser.add_argument('--rear-image-topic', type=str,
-                        default='/camera/camera/color/image_raw',
+                        default='/camera/color/image_raw',
                         help='后方相机图像话题 (默认: /camera/color/image_raw)')
     parser.add_argument('--rear-camera-info-topic', type=str,
-                        default='/camera/camera/color/camera_info',
+                        default='/camera/color/camera_info',
                         help='后方相机信息话题 (默认: /camera/color/camera_info)')
 
     # === 棋盘格参数 ===
@@ -187,6 +189,9 @@ class ExtrinsicCalibratorWithReporting(Node):
 
         # === 图像显示配置 ===
         self.ENABLE_IMAGE_DISPLAY = not args.no_display
+
+        # === 【性能优化】无头模式下优化定时器间隔 ===
+        self.DISPLAY_TIMER_INTERVAL = 0.033 if self.ENABLE_IMAGE_DISPLAY else 1.0  # 30FPS 或 1FPS
 
         # === 【关键】手动测量 T_B_to_T (AGV -> 棋盘格) ===
         self.FRONT_TRANSLATION_B_to_T = np.array(args.front_translation)
@@ -305,9 +310,11 @@ class ExtrinsicCalibratorWithReporting(Node):
 
         if self.ENABLE_IMAGE_DISPLAY:
             self.get_logger().info("🖥️  图形界面模式: 已启用图像显示")
+            self.get_logger().info(f"   显示刷新率: 30 FPS (间隔: {self.DISPLAY_TIMER_INTERVAL*1000:.1f}ms)")
             self.get_logger().info("   按 'q' 退出程序")
         else:
             self.get_logger().info("🖥️  无头模式: 图像显示已禁用（适用于批量生产）")
+            self.get_logger().info(f"   显示刷新率: 1 FPS (间隔: {self.DISPLAY_TIMER_INTERVAL}s) - 性能优化")
             self.get_logger().info("   标定过程完全自动化，无需人工干预")
 
         self.get_logger().info("棋盘格坐标系: X-右, Y-下, Z-向外")
@@ -315,8 +322,8 @@ class ExtrinsicCalibratorWithReporting(Node):
         if not self.ENABLE_AUTO_CALIBRATION:
             self.get_logger().info("⚠️  重要：棋盘格必须每次精确放置在同一位置！")
 
-        # 创建定时器定期检查和显示新图像 (30FPS)
-        self.display_timer = self.create_timer(0.033, self.display_frames)
+        # 创建定时器定期检查和显示新图像 (根据显示模式调整频率)
+        self.display_timer = self.create_timer(self.DISPLAY_TIMER_INTERVAL, self.display_frames)
 
     def init_log_file(self):
         """初始化日志文件"""
