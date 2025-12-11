@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<date>"Thu Nov 28 16:33:10 2019&#x0a;"</date>
+<intrinsicMat type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>3</cols>
+  <dt>d</dt>
+  <data>
+    1.6569115980922788e+02 0. 3.0834318947052969e+02 0.
+    1.6558949989732477e+02 2.3568844482528411e+02 0. 0. 1.</data></intrinsicMat>
+<coeffs type_id="opencv-matrix">
+  <rows>4</rows>
+  <cols>1</cols>
+  <dt>d</dt>
+  <data>
+    1.1331882612492085e-01 -3.7814316377817382e-02
+    1.5555648069157291e-02 -5.3406277868196465e-03</data></coeffs>
+</opencv_storage>

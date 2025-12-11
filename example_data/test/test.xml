@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<date>"Fri Dec  5 13:41:14 2025&#x0a;"</date>
+<intrinsicMat type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>3</cols>
+  <dt>d</dt>
+  <data>
+    6.0376606701396850e+02 0. 3.2805212759925382e+02 0.
+    6.0379684874512213e+02 2.5619380506564329e+02 0. 0. 1.</data></intrinsicMat>
+<coeffs type_id="opencv-matrix">
+  <rows>1</rows>
+  <cols>5</cols>
+  <dt>d</dt>
+  <data>
+    8.0300720567977116e-02 1.2812934433918000e-01
+    -3.7986732115267139e-04 6.3891875576600693e-03
+    -8.8264161571131683e-01</data></coeffs>
+</opencv_storage>

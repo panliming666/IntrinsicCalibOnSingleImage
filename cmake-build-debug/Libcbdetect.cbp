@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Libcbdetect"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\usr\;CMake Files\..\..\..\usr\local\;CMake Files\..\..\..\usr\local\lib\;CMake Files\..\..\..\usr\local\lib\cmake\;CMake Files\..\..\..\usr\local\lib\cmake\opencv4\;CMake Files\src\;CMake Files\src\libcbdetect\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="FisheyeCalibOnSingleImage">
+				<Option output="/home/zjw/IntrinsicCalibOnSingleImage/bin/Debug/FisheyeCalibOnSingleImage" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/bin/Debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DUNIX"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 FisheyeCalibOnSingleImage"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="FisheyeCalibOnSingleImage/fast">
+				<Option output="/home/zjw/IntrinsicCalibOnSingleImage/bin/Debug/FisheyeCalibOnSingleImage" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/bin/Debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DUNIX"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 FisheyeCalibOnSingleImage/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cbdetect">
+				<Option output="/home/zjw/IntrinsicCalibOnSingleImage/lib/Debug/libcbdetect.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DUNIX"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include/libcbdetect"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 cbdetect"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cbdetect/fast">
+				<Option output="/home/zjw/IntrinsicCalibOnSingleImage/lib/Debug/libcbdetect.so" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect"/>
+				<Option object_output="./"/>
+				<Option type="3"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DUNIX"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include"/>
+					<Add directory="/home/zjw/IntrinsicCalibOnSingleImage/include/libcbdetect"/>
+					<Add directory="/usr/local/include/opencv4"/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 cbdetect/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/zjw/IntrinsicCalibOnSingleImage/cmake-build-debug/src/libcbdetect/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/CalibIntrinsic.cpp">
+			<Option target="FisheyeCalibOnSingleImage"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/CalibIntrinsic.h">
+			<Option target="FisheyeCalibOnSingleImage"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/board_energy.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/boards_from_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/create_correlation_patch.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/filter_board.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/filter_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/find_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/find_modes_meanshift.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/get_image_patch.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/get_init_location.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/grow_board.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/image_normalization_and_gradients.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/init_board.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/non_maximum_suppression.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/plot_boards.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/plot_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/polynomial_fit.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/refine_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/score_corners.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/weight_mask.cc">
+			<Option target="cbdetect"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/main.cpp">
+			<Option target="FisheyeCalibOnSingleImage"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/../../../usr/local/lib/cmake/opencv4/OpenCVConfig-version.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/../../../usr/local/lib/cmake/opencv4/OpenCVConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/../../../usr/local/lib/cmake/opencv4/OpenCVModules-release.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/../../../usr/local/lib/cmake/opencv4/OpenCVModules.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\usr\local\lib\cmake\opencv4\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\"/>
+		</Unit>
+		<Unit filename="/home/zjw/IntrinsicCalibOnSingleImage/src/libcbdetect/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\src\libcbdetect\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

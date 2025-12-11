@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/mnt/nvme/byd/amr/camera_calibration/IntrinsicCalibOnSingleImage/build/cmake_install.cmake",
+		"/mnt/nvme/byd/amr/camera_calibration/IntrinsicCalibOnSingleImage/build/src/cmake_install.cmake",
+		"/mnt/nvme/byd/amr/camera_calibration/IntrinsicCalibOnSingleImage/build/src/libcbdetect/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

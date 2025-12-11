@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<opencv_storage>
+<date>"Wed Sep 14 15:31:11 2022&#x0a;"</date>
+<intrinsicMat type_id="opencv-matrix">
+  <rows>3</rows>
+  <cols>3</cols>
+  <dt>d</dt>
+  <data>
+    3.1537689967124487e+02 0. 6.4189649009254288e+02 0.
+    3.1572407125373007e+02 4.6755703813502504e+02 0. 0. 1.</data></intrinsicMat>
+<coeffs type_id="opencv-matrix">
+  <rows>4</rows>
+  <cols>1</cols>
+  <dt>d</dt>
+  <data>
+    1.0061704624039085e-01 2.5344808901530133e-03
+    -8.2538970515966033e-03 1.2340433284087019e-03</data></coeffs>
+</opencv_storage>

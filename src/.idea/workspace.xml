@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="Project" targetName="FisheyeCalibOnSingleImage" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d1ce0e63-c351-41f5-864e-8175da123d8b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../LICENSE" beforeDir="false" afterPath="$PROJECT_DIR$/../LICENSE" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../doc/report.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../doc/report.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/0.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/20190605.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/BACK1121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/FRONT1121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/FRONT1121_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/LEFT1121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/LEFT1121_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/RIGHT1121.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/RIGHT1121_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_back23.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_back42.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_back6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_front12.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_front38.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_left2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_left30.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_right2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/Tag_right36.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back0430.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back04300.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back0431.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back0514.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back201907170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back20190717_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/back20190717_10.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/div6Camera1012/1.png" beforeDir="false" afterPath="$PROJECT_DIR$/../example_data/div6Camera1012/1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/div6Camera1012/2.png" beforeDir="false" afterPath="$PROJECT_DIR$/../example_data/div6Camera1012/2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/div6Camera1012/3.png" beforeDir="false" afterPath="$PROJECT_DIR$/../example_data/div6Camera1012/3.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/div6Camera1012/4.png" beforeDir="false" afterPath="$PROJECT_DIR$/../example_data/div6Camera1012/4.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e00.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e01.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e2_result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e4.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e6.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e6_result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e7.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/e7_result.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/front0431.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/front0514.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/front201907170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/front20190717_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/intrinsic_coeffs_right0430.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/intrinsic_coeffs_right0431.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/intrinsic_coeffs_right2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/intrinsic_coeffs_right36.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left0430.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left0431.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left201907170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left20190717_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left32.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left47.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/left56.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/back1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/back2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/front.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/front2019111.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/front911.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_back.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_back1121.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_back2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_front.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_front1121.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_front1121_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_front911.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_left.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_left0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_left1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_left1121.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_right.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_right1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_right1121.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/intrinsic_coeffs_right2.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/left0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/left1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/left5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right1104.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right5.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/mars1911/right911.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/right0430.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/right0431.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/right201907170.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../example_data/right20190717_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/board_energy.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/board_energy.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/boards_from_cornres.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/boards_from_cornres.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/config.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/config.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/create_correlation_patch.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/create_correlation_patch.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/filter_board.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/filter_board.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/filter_corners.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/filter_corners.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/find_corners.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/find_corners.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/find_modes_meanshift.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/find_modes_meanshift.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/get_image_patch.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/get_image_patch.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/get_init_location.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/get_init_location.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/grow_board.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/grow_board.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/image_normalization_and_gradients.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/image_normalization_and_gradients.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/init_board.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/init_board.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/non_maximum_suppression.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/non_maximum_suppression.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/plot_boards.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/plot_boards.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/plot_corners.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/plot_corners.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/polynomial_fit.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/polynomial_fit.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/refine_corners.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/refine_corners.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/score_corners.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/score_corners.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../include/libcbdetect/weight_mask.h" beforeDir="false" afterPath="$PROJECT_DIR$/../include/libcbdetect/weight_mask.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CalibIntrinsic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/CalibIntrinsic.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CalibIntrinsic.h" beforeDir="false" afterPath="$PROJECT_DIR$/CalibIntrinsic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configuration.h" beforeDir="false" afterPath="$PROJECT_DIR$/configuration.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/board_energy.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/board_energy.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/boards_from_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/boards_from_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/create_correlation_patch.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/create_correlation_patch.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/filter_board.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/filter_board.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/filter_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/filter_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/find_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/find_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/find_modes_meanshift.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/find_modes_meanshift.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/get_image_patch.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/get_image_patch.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/get_init_location.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/get_init_location.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/grow_board.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/grow_board.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/image_normalization_and_gradients.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/image_normalization_and_gradients.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/init_board.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/init_board.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/non_maximum_suppression.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/non_maximum_suppression.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/plot_boards.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/plot_boards.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/plot_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/plot_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/polynomial_fit.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/polynomial_fit.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/refine_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/refine_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/score_corners.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/score_corners.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/libcbdetect/weight_mask.cc" beforeDir="false" afterPath="$PROJECT_DIR$/libcbdetect/weight_mask.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/log_defs.h" beforeDir="false" afterPath="$PROJECT_DIR$/log_defs.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1bvLlztR0W7jDs2RczCvRTiOJzz" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration name="FisheyeCalibOnSingleImage" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Project" TARGET_NAME="FisheyeCalibOnSingleImage" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="Project" RUN_TARGET_NAME="FisheyeCalibOnSingleImage">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d1ce0e63-c351-41f5-864e-8175da123d8b" name="Default Changelist" comment="" />
+      <created>1589507775385</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1589507775385</updated>
+      <workItem from="1589507820508" duration="605000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+</project>
